@@ -1,0 +1,19 @@
+{
+  "id": "white-premium",
+  "title": "Alb Premium",
+  "stage": {
+    "width": 1200,
+    "height": 1500
+  },
+  "sourcePage": "https://goodmockups.com/free-white-shopping-bag-mockup-psd-2/",
+  "license": "DEVELOPMENT PLACEHOLDER - replace with licensed PSD export before production.",
+  "attributionRequired": "Unknown until source PSD is reviewed.",
+  "placeholder": true,
+  "sourceFile": "source-assets/bag-mockups/white-premium.psd",
+  "runtimeFiles": [
+    "base.webp",
+    "overlay.png",
+    "mask.png",
+    "thumbnail.webp"
+  ]
+}

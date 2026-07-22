@@ -1,0 +1,61 @@
+{
+  "name": "cartpaper-ro",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test tests/e2e/a11y.spec.ts",
+    "prepare:brand": "node scripts/prepare-brand-assets.mjs",
+    "prepare:placeholders": "node scripts/generate-placeholder-assets.mjs",
+    "optimize:images": "node scripts/optimize-images.mjs",
+    "verify:mockups": "node scripts/verify-mockup-assets.mjs",
+    "verify:assets": "node scripts/verify-production-assets.mjs",
+    "screenshots": "playwright test tests/e2e/screenshots.spec.ts",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run verify:mockups && npm run verify:assets && npm run build",
+    "postinstall": "npm run prepare:brand && npm run prepare:placeholders"
+  },
+  "dependencies": {
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "clsx": "latest",
+    "dompurify": "latest",
+    "konva": "latest",
+    "lucide-react": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-konva": "latest",
+    "sharp": "^0.35.3",
+    "use-image": "latest",
+    "zod": "latest"
+  },
+  "overrides": {
+    "postcss": "^8.5.10",
+    "sharp": "^0.35.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "latest",
+    "@eslint/eslintrc": "latest",
+    "@playwright/test": "latest",
+    "@testing-library/jest-dom": "latest",
+    "@testing-library/react": "latest",
+    "@testing-library/user-event": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "jsdom": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
+  }
+}

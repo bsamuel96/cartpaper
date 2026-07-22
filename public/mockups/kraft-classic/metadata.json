@@ -1,0 +1,19 @@
+{
+  "id": "kraft-classic",
+  "title": "Kraft Clasic",
+  "stage": {
+    "width": 1200,
+    "height": 1500
+  },
+  "sourcePage": "https://goodmockups.com/free-kraft-paper-shopping-bag-mockup-psd-3/",
+  "license": "DEVELOPMENT PLACEHOLDER - replace with licensed PSD export before production.",
+  "attributionRequired": "Unknown until source PSD is reviewed.",
+  "placeholder": true,
+  "sourceFile": "source-assets/bag-mockups/kraft-classic.psd",
+  "runtimeFiles": [
+    "base.webp",
+    "overlay.png",
+    "mask.png",
+    "thumbnail.webp"
+  ]
+}

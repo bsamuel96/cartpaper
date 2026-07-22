@@ -1,0 +1,56 @@
+{
+  "lime": "#bdec14",
+  "sampledFrom": "logo/*.png",
+  "sourcePath": "/Users/samuelbuzatu/Desktop/git things/cartpaper.ro/logo",
+  "generatedAt": "2026-07-22T11:57:29.308Z",
+  "assets": [
+    {
+      "source": "1.png",
+      "target": "cartpaper-wordmark-light-surface.png",
+      "role": "wordmark",
+      "background": "light",
+      "notes": "Transparent PNG with dark wordmark and lime .ro accent.",
+      "copied": true,
+      "publicPath": "/brand/cartpaper-wordmark-light-surface.png",
+      "format": "png",
+      "dimensions": "2000x2000",
+      "alpha": true
+    },
+    {
+      "source": "2.png",
+      "target": "cartpaper-icon-light-surface.png",
+      "role": "icon",
+      "background": "light",
+      "notes": "Transparent icon variant for light surfaces.",
+      "copied": true,
+      "publicPath": "/brand/cartpaper-icon-light-surface.png",
+      "format": "png",
+      "dimensions": "2000x2000",
+      "alpha": true
+    },
+    {
+      "source": "3.png",
+      "target": "cartpaper-wordmark-dark-surface.png",
+      "role": "wordmark",
+      "background": "dark",
+      "notes": "Transparent PNG with light wordmark and lime .ro accent.",
+      "copied": true,
+      "publicPath": "/brand/cartpaper-wordmark-dark-surface.png",
+      "format": "png",
+      "dimensions": "2000x2000",
+      "alpha": true
+    },
+    {
+      "source": "4.png",
+      "target": "cartpaper-icon-dark-surface.png",
+      "role": "icon",
+      "background": "dark",
+      "notes": "Transparent icon variant for dark surfaces.",
+      "copied": true,
+      "publicPath": "/brand/cartpaper-icon-dark-surface.png",
+      "format": "png",
+      "dimensions": "2000x2000",
+      "alpha": true
+    }
+  ]
+}

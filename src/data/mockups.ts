@@ -1,0 +1,100 @@
+import type { MockupPreset } from "@/types/mockup";
+
+const stage = { width: 1200, height: 1500 };
+
+export const mockupPresets: MockupPreset[] = [
+  {
+    id: "kraft-classic",
+    label: "Kraft Clasic",
+    shortDescription: "Pungă natur cu mâner răsucit și textură caldă.",
+    baseSrc: "/mockups/kraft-classic/base.webp",
+    overlaySrc: "/mockups/kraft-classic/overlay.png",
+    maskSrc: "/mockups/kraft-classic/mask.png",
+    thumbnailSrc: "/mockups/kraft-classic/thumbnail.webp",
+    stage,
+    printQuad: [
+      { x: 325, y: 470 },
+      { x: 875, y: 470 },
+      { x: 930, y: 1170 },
+      { x: 270, y: 1170 },
+    ],
+    defaultLogo: { x: 600, y: 820, width: 360, rotation: 0 },
+    recommendedColorMode: "black",
+    recommendedBlendMode: "multiply",
+    accessibleDescription: "Mockup kraft clasic cu suprafață frontală caldă pentru logo-uri închise.",
+    placeholder: true,
+  },
+  {
+    id: "white-premium",
+    label: "Alb Premium",
+    shortDescription: "Pungă albă, luminoasă, pentru identități curate.",
+    baseSrc: "/mockups/white-premium/base.webp",
+    overlaySrc: "/mockups/white-premium/overlay.png",
+    maskSrc: "/mockups/white-premium/mask.png",
+    thumbnailSrc: "/mockups/white-premium/thumbnail.webp",
+    stage,
+    printQuad: [
+      { x: 295, y: 455 },
+      { x: 905, y: 455 },
+      { x: 900, y: 1180 },
+      { x: 300, y: 1180 },
+    ],
+    defaultLogo: { x: 600, y: 820, width: 390, rotation: 0 },
+    recommendedColorMode: "lime",
+    recommendedBlendMode: "multiply",
+    accessibleDescription: "Mockup alb premium cu suprafață clară pentru print color sau negru.",
+    placeholder: true,
+  },
+  {
+    id: "black-luxury",
+    label: "Negru Elegant",
+    shortDescription: "Pungă neagră cu aspect premium și contrast ridicat.",
+    baseSrc: "/mockups/black-luxury/base.webp",
+    overlaySrc: "/mockups/black-luxury/overlay.png",
+    maskSrc: "/mockups/black-luxury/mask.png",
+    thumbnailSrc: "/mockups/black-luxury/thumbnail.webp",
+    stage,
+    printQuad: [
+      { x: 335, y: 500 },
+      { x: 865, y: 445 },
+      { x: 920, y: 1165 },
+      { x: 285, y: 1200 },
+    ],
+    defaultLogo: { x: 610, y: 825, width: 350, rotation: -2 },
+    recommendedColorMode: "white",
+    recommendedBlendMode: "screen",
+    accessibleDescription: "Mockup negru elegant pentru logo-uri albe sau verde Cartpaper.",
+    placeholder: true,
+  },
+  {
+    id: "color-pop",
+    label: "Culoare Intensă",
+    shortDescription: "Pungă coral pentru campanii, lansări și cadouri.",
+    baseSrc: "/mockups/color-pop/base.webp",
+    overlaySrc: "/mockups/color-pop/overlay.png",
+    maskSrc: "/mockups/color-pop/mask.png",
+    thumbnailSrc: "/mockups/color-pop/thumbnail.webp",
+    stage,
+    printQuad: [
+      { x: 310, y: 460 },
+      { x: 890, y: 460 },
+      { x: 890, y: 1188 },
+      { x: 310, y: 1188 },
+    ],
+    defaultLogo: { x: 600, y: 830, width: 380, rotation: 0 },
+    recommendedColorMode: "white",
+    recommendedBlendMode: "normal",
+    bagColorOptions: [
+      { id: "coral", label: "Coral", value: "#cb4d45" },
+      { id: "navy", label: "Bleumarin", value: "#172039" },
+      { id: "blush", label: "Roz pudrat", value: "#e9b6ab" },
+      { id: "lime", label: "Verde lime", value: "#bdec14" },
+    ],
+    accessibleDescription: "Mockup culoare intensă pentru logo-uri albe, negre sau originale.",
+    placeholder: true,
+  },
+];
+
+export function getMockupPreset(id: string) {
+  return mockupPresets.find((preset) => preset.id === id) ?? mockupPresets[0];
+}

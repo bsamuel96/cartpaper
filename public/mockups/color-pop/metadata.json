@@ -1,0 +1,19 @@
+{
+  "id": "color-pop",
+  "title": "Culoare Intensă",
+  "stage": {
+    "width": 1200,
+    "height": 1500
+  },
+  "sourcePage": "https://mockups-design.com/paper-gift-bag-mockup/",
+  "license": "DEVELOPMENT PLACEHOLDER - replace with licensed PSD export before production.",
+  "attributionRequired": "Unknown until source PSD is reviewed.",
+  "placeholder": true,
+  "sourceFile": "source-assets/bag-mockups/color-pop.psd",
+  "runtimeFiles": [
+    "base.webp",
+    "overlay.png",
+    "mask.png",
+    "thumbnail.webp"
+  ]
+}

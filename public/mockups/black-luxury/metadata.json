@@ -1,0 +1,19 @@
+{
+  "id": "black-luxury",
+  "title": "Negru Elegant",
+  "stage": {
+    "width": 1200,
+    "height": 1500
+  },
+  "sourcePage": "https://unblast.com/free-dark-shopping-bag-mockup-psd/",
+  "license": "DEVELOPMENT PLACEHOLDER - replace with licensed PSD export before production.",
+  "attributionRequired": "Unknown until source PSD is reviewed.",
+  "placeholder": true,
+  "sourceFile": "source-assets/bag-mockups/black-luxury.psd",
+  "runtimeFiles": [
+    "base.webp",
+    "overlay.png",
+    "mask.png",
+    "thumbnail.webp"
+  ]
+}
