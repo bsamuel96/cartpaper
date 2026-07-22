@@ -1,0 +1,9 @@
+{
+  "file": "anpc-sal.png",
+  "dimensions": {
+    "width": 250,
+    "height": 50
+  },
+  "placeholder": true,
+  "note": "Development-only placeholder. Replace with official ANPC SAL artwork and set placeholder to false before production."
+}

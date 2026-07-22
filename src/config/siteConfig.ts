@@ -5,7 +5,7 @@ export const siteConfig = {
   title: "Cartpaper — Pungi de hârtie personalizate",
   description:
     "Pungi de hârtie personalizate pentru retail, evenimente și branduri. Încarcă logo-ul, testează patru simulări și solicită o ofertă.",
-  brandLime: "#bdec14",
+  brandLime: "#bded15",
   consentCookieName: "cartpaper_consent",
   consentVersion: "2026-07-22",
 };

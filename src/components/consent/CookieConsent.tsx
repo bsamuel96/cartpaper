@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
 import { useConsent } from "@/hooks/useConsent";
 import { defaultConsentCategories, type ConsentCategories } from "@/lib/consent/consent";
 
@@ -72,10 +73,20 @@ export function CookieConsent() {
     <>
       {!hasDecision ? (
         <section className="cookieBanner" aria-label="Consimțământ cookie">
-          <p>
-            Folosim cookie-uri necesare pentru funcționarea site-ului. Cu acordul tău, putem activa
-            cookie-uri de analiză și marketing. Poți accepta, refuza sau personaliza opțiunile.
-          </p>
+          <div className="cookieBannerTop">
+            <p>
+              Folosim cookie-uri necesare pentru funcționarea site-ului. Cu acordul tău, putem activa
+              cookie-uri de analiză și marketing. Poți accepta, refuza sau personaliza opțiunile.
+            </p>
+            <button
+              className="iconButton"
+              type="button"
+              aria-label="Închide bannerul cookie"
+              onClick={() => saveAndClose(defaultConsentCategories)}
+            >
+              <X aria-hidden="true" size={20} />
+            </button>
+          </div>
           <div className="cookieActions">
             <button className="button buttonGhost" type="button" onClick={() => saveAndClose(defaultConsentCategories)}>
               Refuză opționale

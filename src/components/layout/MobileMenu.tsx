@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { BrandLockup } from "@/components/brand/BrandLockup";
 import { navItems } from "@/content/siteContent";
 
-export function MobileMenu() {
+export function MobileMenu({ variant = "light" }: { variant?: "light" | "dark" }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -60,7 +61,7 @@ export function MobileMenu() {
             onMouseDown={(event) => event.stopPropagation()}
           >
             <div className="mobileMenuTop">
-              <span className="mobileMenuBrand">Cartpaper</span>
+              <BrandLockup variant={variant} />
               <button className="iconButton" type="button" aria-label="Închide meniul" onClick={closeMenu}>
                 <X aria-hidden="true" size={24} />
               </button>
@@ -72,10 +73,14 @@ export function MobileMenu() {
                 </Link>
               ))}
             </nav>
-            <button className="button buttonPrimary" type="button" onClick={() => {
-              closeMenu();
-              window.dispatchEvent(new CustomEvent("cartpaper:open-quote"));
-            }}>
+            <button
+              className="button buttonPrimary"
+              type="button"
+              onClick={() => {
+                closeMenu();
+                window.dispatchEvent(new CustomEvent("cartpaper:open-quote"));
+              }}
+            >
               Cere ofertă
             </button>
           </div>

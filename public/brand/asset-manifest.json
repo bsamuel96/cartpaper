@@ -1,0 +1,108 @@
+{
+  "version": "v3",
+  "generatedAt": "2026-07-22T16:41:36.386Z",
+  "sourcePath": "/Users/samuelbuzatu/Desktop/git things/cartpaper.ro/logo",
+  "canonicalLime": "#b2e31a",
+  "selectedOnly": [
+    "logo 2",
+    "logo 4"
+  ],
+  "sources": {
+    "light": {
+      "intendedSurface": "light",
+      "role": "cartpaper icon mark",
+      "fileName": "2.png",
+      "hash": "549c6bedb6a4e3630efaf19e5cd739104bf8e09d45bd5f770f17772835235b49",
+      "stats": {
+        "width": 2000,
+        "height": 2000,
+        "channels": 4,
+        "hasAlpha": true,
+        "transparentPixels": 3554911,
+        "semiTransparentPixels": 119327,
+        "opaquePixels": 325762,
+        "transparentRatio": 0.8887,
+        "semiTransparentRatio": 0.0298,
+        "opaqueRatio": 0.0814,
+        "dominantLime": "#b2e31a"
+      }
+    },
+    "dark": {
+      "intendedSurface": "dark",
+      "role": "cartpaper icon mark",
+      "fileName": "4.png",
+      "hash": "5b858b5295f32e48cba4b857219f26010e77165df6caabf08aba44e75f09fe2a",
+      "stats": {
+        "width": 2000,
+        "height": 2000,
+        "channels": 4,
+        "hasAlpha": true,
+        "transparentPixels": 3458157,
+        "semiTransparentPixels": 82898,
+        "opaquePixels": 458945,
+        "transparentRatio": 0.8645,
+        "semiTransparentRatio": 0.0207,
+        "opaqueRatio": 0.1147,
+        "dominantLime": "#bdec14"
+      }
+    }
+  },
+  "generated": {
+    "lightMark": {
+      "file": "cartpaper-mark-light.png",
+      "publicPath": "/brand/cartpaper-mark-light.png",
+      "width": 1301,
+      "height": 1482,
+      "bytes": 581543,
+      "hash": "57257db6ec9dd521462ea87e7aca03caa9739ac74503fedc7d654e8266f51c30"
+    },
+    "darkMark": {
+      "file": "cartpaper-mark-dark.png",
+      "publicPath": "/brand/cartpaper-mark-dark.png",
+      "width": 1490,
+      "height": 1693,
+      "bytes": 522229,
+      "hash": "9b8e90ad6e2a94b65f5cbfdd0b054c39e3fd38e9d510145ea76aaee8becc9ed0"
+    },
+    "faviconLight": {
+      "file": "favicon-light.png",
+      "publicPath": "/brand/favicon-light.png",
+      "width": 236,
+      "height": 260,
+      "bytes": 6114,
+      "hash": "5735a495d624a1fb28869b68fc16681a3f2c3c6c49e941d13b0c7a7381fd2616"
+    },
+    "faviconDark": {
+      "file": "favicon-dark.png",
+      "publicPath": "/brand/favicon-dark.png",
+      "width": 260,
+      "height": 288,
+      "bytes": 5798,
+      "hash": "87c5ef8e1023d41d7a2ec8a72575247f713dd34cdb3f9601d86debc1926ae5c9"
+    },
+    "appleTouchIcon": {
+      "file": "apple-touch-icon.png",
+      "publicPath": "/brand/apple-touch-icon.png",
+      "width": 352,
+      "height": 376,
+      "bytes": 28664,
+      "hash": "55913a25046cf34d8ef9026aba29f2dff40e638ab38283f1a933bbe4c8063796"
+    },
+    "ogMarkLight": {
+      "file": "og-mark-light.png",
+      "publicPath": "/brand/og-mark-light.png",
+      "width": 684,
+      "height": 708,
+      "bytes": 143104,
+      "hash": "0fcc5ede90162f770ee038e73469806a2f3dc2af8e7d785b93e4d347c3273372"
+    },
+    "ogMarkDark": {
+      "file": "og-mark-dark.png",
+      "publicPath": "/brand/og-mark-dark.png",
+      "width": 708,
+      "height": 736,
+      "bytes": 118246,
+      "hash": "d6cb80c7be0b5979549e268ac62085af5f6d4236c9e71ff469d182160998b179"
+    }
+  }
+}

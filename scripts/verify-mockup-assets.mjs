@@ -6,7 +6,20 @@ import sharp from "sharp";
 const root = process.cwd();
 const production = process.env.CARTPAPER_PRODUCTION === "true";
 const ids = ["kraft-classic", "white-premium", "black-luxury", "color-pop"];
-const required = ["base.webp", "overlay.png", "mask.png", "thumbnail.webp", "metadata.json"];
+const required = [
+  "base.webp",
+  "poster.webp",
+  "overlay.png",
+  "mask.png",
+  "shadow-overlay.png",
+  "highlight-overlay.png",
+  "handle-overlay.png",
+  "print-mask.png",
+  "bag-color-mask.png",
+  "displacement-map.png",
+  "thumbnail.webp",
+  "metadata.json",
+];
 const errors = [];
 const warnings = [];
 
@@ -34,13 +47,22 @@ for (const id of ids) {
   const basePath = path.join(dir, "base.webp");
   const overlayPath = path.join(dir, "overlay.png");
   const maskPath = path.join(dir, "mask.png");
+  const v3OverlayPaths = [
+    "shadow-overlay.png",
+    "highlight-overlay.png",
+    "handle-overlay.png",
+    "print-mask.png",
+    "bag-color-mask.png",
+    "displacement-map.png",
+  ].map((file) => path.join(dir, file));
   const metadataPath = path.join(dir, "metadata.json");
 
-  if (existsSync(basePath) && existsSync(overlayPath) && existsSync(maskPath)) {
-    const [base, overlay, mask] = await Promise.all([
+  if (existsSync(basePath) && existsSync(overlayPath) && existsSync(maskPath) && v3OverlayPaths.every(existsSync)) {
+    const [base, overlay, mask, ...v3Overlays] = await Promise.all([
       sharp(basePath).metadata(),
       sharp(overlayPath).metadata(),
       sharp(maskPath).metadata(),
+      ...v3OverlayPaths.map((file) => sharp(file).metadata()),
     ]);
 
     if (base.width !== 1200 || base.height !== 1500) {
@@ -54,6 +76,11 @@ for (const id of ids) {
     }
     if (!overlay.hasAlpha) {
       errors.push(`${id}: overlay must contain alpha`);
+    }
+    for (const overlayMetadata of v3Overlays) {
+      if (overlayMetadata.width !== base.width || overlayMetadata.height !== base.height) {
+        errors.push(`${id}: V3 overlay dimensions do not match base`);
+      }
     }
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { BlendMode, LogoColorMode, LogoTransform, MockupId } from "@/types/mockup";
+import type { BlendMode, LogoColorMode, LogoTransform, MockupId, PrintFinish } from "@/types/mockup";
 
 const storageKey = "cartpaper_personalizer_state";
 
@@ -10,6 +10,7 @@ export type StoredPersonalizerState = {
   logoMode: LogoColorMode;
   customColor: string;
   blendMode: BlendMode;
+  printFinish: PrintFinish;
   transform: LogoTransform;
   backgroundMethod: "none" | "transparent" | "local" | "advanced";
 };

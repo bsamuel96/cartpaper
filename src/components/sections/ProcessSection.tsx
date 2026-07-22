@@ -5,10 +5,10 @@ const icons = [Upload, Palette, Send];
 
 export function ProcessSection() {
   return (
-    <section className="pageBand" id="proces" aria-labelledby="process-title">
+    <section className="pageBand processBand" id="proces" data-header-theme="light" aria-labelledby="process-title">
       <p className="overline">{homeContent.process.overline}</p>
       <h2 id="process-title">{homeContent.process.title}</h2>
-      <div className="processGrid">
+      <div className="processGrid stickyProcessGrid">
         {homeContent.process.steps.map((step, index) => {
           const Icon = icons[index];
           return (

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-22T11:57:29.783Z",
+  "generatedAt": "2026-07-22T17:03:52.055Z",
   "placeholder": true,
   "stage": {
     "width": 1200,
@@ -20,8 +20,15 @@
       "sourceFile": "source-assets/bag-mockups/kraft-classic.psd",
       "runtimeFiles": [
         "base.webp",
+        "poster.webp",
         "overlay.png",
         "mask.png",
+        "shadow-overlay.png",
+        "highlight-overlay.png",
+        "handle-overlay.png",
+        "print-mask.png",
+        "bag-color-mask.png",
+        "displacement-map.png",
         "thumbnail.webp"
       ]
     },
@@ -39,8 +46,15 @@
       "sourceFile": "source-assets/bag-mockups/white-premium.psd",
       "runtimeFiles": [
         "base.webp",
+        "poster.webp",
         "overlay.png",
         "mask.png",
+        "shadow-overlay.png",
+        "highlight-overlay.png",
+        "handle-overlay.png",
+        "print-mask.png",
+        "bag-color-mask.png",
+        "displacement-map.png",
         "thumbnail.webp"
       ]
     },
@@ -58,8 +72,15 @@
       "sourceFile": "source-assets/bag-mockups/black-luxury.psd",
       "runtimeFiles": [
         "base.webp",
+        "poster.webp",
         "overlay.png",
         "mask.png",
+        "shadow-overlay.png",
+        "highlight-overlay.png",
+        "handle-overlay.png",
+        "print-mask.png",
+        "bag-color-mask.png",
+        "displacement-map.png",
         "thumbnail.webp"
       ]
     },
@@ -77,8 +98,15 @@
       "sourceFile": "source-assets/bag-mockups/color-pop.psd",
       "runtimeFiles": [
         "base.webp",
+        "poster.webp",
         "overlay.png",
         "mask.png",
+        "shadow-overlay.png",
+        "highlight-overlay.png",
+        "handle-overlay.png",
+        "print-mask.png",
+        "bag-color-mask.png",
+        "displacement-map.png",
         "thumbnail.webp"
       ]
     }

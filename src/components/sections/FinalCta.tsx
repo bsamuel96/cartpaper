@@ -4,7 +4,8 @@ import { QuoteButton } from "@/components/quote/QuoteButton";
 
 export function FinalCta() {
   return (
-    <section className="finalCta" aria-labelledby="final-cta-title">
+    <section className="finalCta" data-header-theme="lime" aria-labelledby="final-cta-title">
+      <span className="finalCtaHandle" aria-hidden="true" />
       <p className="overline">{homeContent.finalCta.overline}</p>
       <h2 id="final-cta-title">{homeContent.finalCta.title}</h2>
       <p>{homeContent.finalCta.body}</p>

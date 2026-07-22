@@ -115,6 +115,71 @@ function maskSvg(mockup) {
   </svg>`;
 }
 
+function shadowOverlaySvg() {
+  return `
+  <svg width="${stage.width}" height="${stage.height}" viewBox="0 0 ${stage.width} ${stage.height}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="floor" cx="50%" cy="85%" r="44%">
+        <stop offset="0" stop-color="#000" stop-opacity=".28"/>
+        <stop offset="1" stop-color="#000" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="crease" x1="0" x2="1">
+        <stop offset="0" stop-color="#000" stop-opacity=".18"/>
+        <stop offset=".48" stop-color="#000" stop-opacity="0"/>
+        <stop offset="1" stop-color="#000" stop-opacity=".22"/>
+      </linearGradient>
+    </defs>
+    <ellipse cx="600" cy="1308" rx="380" ry="88" fill="url(#floor)"/>
+    <path d="M245 430 L315 1355" stroke="#000" stroke-width="16" opacity=".10"/>
+    <path d="M600 430 L600 1355" stroke="url(#crease)" stroke-width="50" opacity=".22"/>
+  </svg>`;
+}
+
+function highlightOverlaySvg() {
+  return `
+  <svg width="${stage.width}" height="${stage.height}" viewBox="0 0 ${stage.width} ${stage.height}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="shine" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#fff" stop-opacity=".36"/>
+        <stop offset=".34" stop-color="#fff" stop-opacity=".05"/>
+        <stop offset="1" stop-color="#fff" stop-opacity=".18"/>
+      </linearGradient>
+    </defs>
+    <path d="M300 475 C435 510 765 510 900 475" fill="none" stroke="#fff" stroke-width="8" opacity=".28"/>
+    <polygon points="305,465 610,440 550,1245 285,1200" fill="url(#shine)" opacity=".30"/>
+  </svg>`;
+}
+
+function handleOverlaySvg(mockup) {
+  return `
+  <svg width="${stage.width}" height="${stage.height}" viewBox="0 0 ${stage.width} ${stage.height}" xmlns="http://www.w3.org/2000/svg">
+    <path d="M410 440 C415 225 785 225 790 440" fill="none" stroke="${mockup.handle}" stroke-width="54" stroke-linecap="round"/>
+    <path d="M410 440 C415 225 785 225 790 440" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" opacity=".18"/>
+  </svg>`;
+}
+
+function bagColorMaskSvg() {
+  return `
+  <svg width="${stage.width}" height="${stage.height}" viewBox="0 0 ${stage.width} ${stage.height}" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="1500" fill="#000"/>
+    <path d="M245 430 L955 430 L1015 1235 C1020 1308 965 1355 885 1355 L315 1355 C235 1355 180 1308 185 1235 Z" fill="#fff"/>
+  </svg>`;
+}
+
+function displacementSvg() {
+  return `
+  <svg width="${stage.width}" height="${stage.height}" viewBox="0 0 ${stage.width} ${stage.height}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="paperNoise">
+        <feTurbulence type="fractalNoise" baseFrequency=".018 .055" numOctaves="4" seed="14"/>
+        <feColorMatrix type="saturate" values="0"/>
+      </filter>
+    </defs>
+    <rect width="1200" height="1500" fill="#808080"/>
+    <rect width="1200" height="1500" filter="url(#paperNoise)" opacity=".38"/>
+  </svg>`;
+}
+
 await mkdir(mockupRoot, { recursive: true });
 await mkdir(legalRoot, { recursive: true });
 
@@ -130,9 +195,16 @@ for (const mockup of mockups) {
   await mkdir(dir, { recursive: true });
 
   await sharp(Buffer.from(baseSvg(mockup))).webp({ quality: 88 }).toFile(path.join(dir, "base.webp"));
+  await sharp(Buffer.from(baseSvg(mockup))).webp({ quality: 90 }).toFile(path.join(dir, "poster.webp"));
   await sharp(Buffer.from(baseSvg(mockup))).resize(480, 600).webp({ quality: 78 }).toFile(path.join(dir, "thumbnail.webp"));
   await sharp(Buffer.from(overlaySvg(mockup))).png().toFile(path.join(dir, "overlay.png"));
   await sharp(Buffer.from(maskSvg(mockup))).png().toFile(path.join(dir, "mask.png"));
+  await sharp(Buffer.from(shadowOverlaySvg())).png().toFile(path.join(dir, "shadow-overlay.png"));
+  await sharp(Buffer.from(highlightOverlaySvg())).png().toFile(path.join(dir, "highlight-overlay.png"));
+  await sharp(Buffer.from(handleOverlaySvg(mockup))).png().toFile(path.join(dir, "handle-overlay.png"));
+  await sharp(Buffer.from(maskSvg(mockup))).png().toFile(path.join(dir, "print-mask.png"));
+  await sharp(Buffer.from(bagColorMaskSvg())).png().toFile(path.join(dir, "bag-color-mask.png"));
+  await sharp(Buffer.from(displacementSvg())).png().toFile(path.join(dir, "displacement-map.png"));
 
   const metadata = {
     id: mockup.id,
@@ -143,7 +215,19 @@ for (const mockup of mockups) {
     attributionRequired: "Unknown until source PSD is reviewed.",
     placeholder: true,
     sourceFile: `source-assets/bag-mockups/${mockup.id}.psd`,
-    runtimeFiles: ["base.webp", "overlay.png", "mask.png", "thumbnail.webp"],
+    runtimeFiles: [
+      "base.webp",
+      "poster.webp",
+      "overlay.png",
+      "mask.png",
+      "shadow-overlay.png",
+      "highlight-overlay.png",
+      "handle-overlay.png",
+      "print-mask.png",
+      "bag-color-mask.png",
+      "displacement-map.png",
+      "thumbnail.webp",
+    ],
   };
 
   await writeFile(path.join(dir, "metadata.json"), `${JSON.stringify(metadata, null, 2)}\n`);
@@ -161,5 +245,18 @@ const anpcSvg = `
 </svg>`;
 
 await sharp(Buffer.from(anpcSvg)).png().toFile(path.join(legalRoot, "anpc-sal.png"));
+await writeFile(
+  path.join(legalRoot, "anpc-sal.metadata.json"),
+  `${JSON.stringify(
+    {
+      file: "anpc-sal.png",
+      dimensions: { width: 250, height: 50 },
+      placeholder: true,
+      note: "Development-only placeholder. Replace with official ANPC SAL artwork and set placeholder to false before production.",
+    },
+    null,
+    2,
+  )}\n`,
+);
 
 console.log(`Generated ${mockups.length} development mockup placeholders.`);

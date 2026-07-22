@@ -16,8 +16,12 @@ function requireFile(relativePath, label) {
   return file;
 }
 
-requireFile("public/brand/cartpaper-wordmark-light-surface.png", "Wordmark Cartpaper pentru fundal deschis");
-requireFile("public/brand/cartpaper-icon-light-surface.png", "Icon Cartpaper pentru fundal deschis");
+requireFile("public/brand/cartpaper-mark-light.png", "Logo 2 Cartpaper pentru fundal deschis");
+requireFile("public/brand/cartpaper-mark-dark.png", "Logo 4 Cartpaper pentru fundal închis");
+requireFile("public/brand/favicon-light.png", "Favicon Cartpaper pentru temă deschisă");
+requireFile("public/brand/favicon-dark.png", "Favicon Cartpaper pentru temă închisă");
+requireFile("public/brand/apple-touch-icon.png", "Apple touch icon Cartpaper");
+requireFile("public/brand/asset-manifest.json", "Manifest brand V3");
 
 const manifestFile = requireFile("public/mockups/asset-manifest.json", "Manifest mockupuri");
 if (existsSync(manifestFile)) {
@@ -28,6 +32,7 @@ if (existsSync(manifestFile)) {
 }
 
 const anpcFile = requireFile("public/legal/anpc-sal.png", "Artwork ANPC SAL");
+const anpcMetadataFile = path.join(root, "public", "legal", "anpc-sal.metadata.json");
 if (existsSync(anpcFile)) {
   const metadata = await sharp(anpcFile).metadata();
   if (metadata.width !== 250 || metadata.height !== 50) {
@@ -38,6 +43,16 @@ if (existsSync(anpcFile)) {
   if (isLikelyPlaceholder) {
     warnings.push("ANPC SAL pare a fi un placeholder; verifică manual artwork-ul oficial.");
   }
+}
+if (existsSync(anpcMetadataFile)) {
+  const metadata = JSON.parse(await readFile(anpcMetadataFile, "utf8"));
+  if (metadata.placeholder !== false) {
+    const message = "ANPC SAL este încă marcat ca placeholder de dezvoltare.";
+    if (production) blockers.push(message);
+    else warnings.push(message);
+  }
+} else if (production) {
+  blockers.push("Metadatele ANPC SAL lipsesc; marchează explicit artwork-ul oficial cu placeholder=false.");
 }
 
 const envChecks = [

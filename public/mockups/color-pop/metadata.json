@@ -12,8 +12,15 @@
   "sourceFile": "source-assets/bag-mockups/color-pop.psd",
   "runtimeFiles": [
     "base.webp",
+    "poster.webp",
     "overlay.png",
     "mask.png",
+    "shadow-overlay.png",
+    "highlight-overlay.png",
+    "handle-overlay.png",
+    "print-mask.png",
+    "bag-color-mask.png",
+    "displacement-map.png",
     "thumbnail.webp"
   ]
 }

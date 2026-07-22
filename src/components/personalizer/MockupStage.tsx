@@ -4,9 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text, Transformer } from "react-konva";
 import Konva from "konva";
 import useImage from "use-image";
-import type { BlendMode, LogoColorMode, LogoTransform, MockupPreset } from "@/types/mockup";
+import type { BlendMode, LogoColorMode, LogoTransform, MockupPreset, PrintFinish } from "@/types/mockup";
 
-const lime = "#bdec14";
+const lime = "#bded15";
 
 type MockupStageProps = {
   preset: MockupPreset;
@@ -15,6 +15,7 @@ type MockupStageProps = {
   logoMode: LogoColorMode;
   customColor: string;
   blendMode: BlendMode;
+  printFinish?: PrintFinish;
   editable?: boolean;
   onTransformChange?: (transform: LogoTransform) => void;
 };
@@ -26,6 +27,7 @@ export function MockupStage({
   logoMode,
   customColor,
   blendMode,
+  printFinish = "matte-ink",
   editable = false,
   onTransformChange,
 }: MockupStageProps) {
@@ -35,6 +37,9 @@ export function MockupStage({
   const [width, setWidth] = useState(360);
   const [base] = useImage(preset.baseSrc);
   const [overlay] = useImage(preset.overlaySrc);
+  const [shadowOverlay] = useImage(preset.shadowOverlaySrc);
+  const [highlightOverlay] = useImage(preset.highlightOverlaySrc);
+  const [handleOverlay] = useImage(preset.handleOverlaySrc);
   const [logo] = useImage(logoUrl ?? "");
   const logoAspect = logo ? logo.height / logo.width : 1;
   const scale = width / preset.stage.width;
@@ -73,6 +78,33 @@ export function MockupStage({
   }, [tintFilter]);
 
   const composite = blendMode === "automatic" ? preset.recommendedBlendMode : blendMode;
+  const finishTint =
+    printFinish === "gold-foil"
+      ? "#d4af37"
+      : printFinish === "silver-foil"
+        ? "#d9dde2"
+        : printFinish === "white-ink"
+          ? "#ffffff"
+          : tintFilter;
+  const finishRgb = useMemo(() => {
+    if (!finishTint || logoMode === "original" && printFinish === "matte-ink") return tintRgb;
+    const hex = finishTint.replace("#", "");
+    return {
+      red: Number.parseInt(hex.slice(0, 2), 16),
+      green: Number.parseInt(hex.slice(2, 4), 16),
+      blue: Number.parseInt(hex.slice(4, 6), 16),
+    };
+  }, [finishTint, logoMode, printFinish, tintRgb]);
+  const logoShadow =
+    printFinish === "emboss"
+      ? { color: "#ffffff", blur: 8, offset: { x: -5, y: -5 }, opacity: 0.42 }
+      : printFinish === "deboss"
+        ? { color: "#000000", blur: 7, offset: { x: 5, y: 5 }, opacity: 0.32 }
+        : printFinish === "spot-uv"
+          ? { color: "#ffffff", blur: 12, offset: { x: 0, y: 0 }, opacity: 0.36 }
+          : printFinish.includes("foil")
+            ? { color: "#ffffff", blur: 10, offset: { x: -3, y: -3 }, opacity: 0.5 }
+            : null;
 
   function emitTransform(node: Konva.Image) {
     const nextWidth = Math.max(80, node.width() * node.scaleX());
@@ -89,13 +121,13 @@ export function MockupStage({
 
   useEffect(() => {
     if (!imageRef.current) return;
-    if (tintRgb) {
+    if (finishRgb) {
       imageRef.current.cache();
     } else {
       imageRef.current.clearCache();
     }
     imageRef.current.getLayer()?.batchDraw();
-  }, [logo, tintRgb]);
+  }, [logo, finishRgb]);
 
   return (
     <div className="mockupStageFrame" ref={containerRef}>
@@ -117,7 +149,7 @@ export function MockupStage({
               context.closePath();
             }}
           >
-            {logo ? (
+          {logo ? (
               <>
                 <KonvaImage
                   ref={imageRef}
@@ -132,11 +164,15 @@ export function MockupStage({
                   opacity={transform.opacity}
                   draggable={editable}
                   globalCompositeOperation={composite === "multiply" || composite === "screen" ? composite : "source-over"}
-                  filters={tintRgb ? [Konva.Filters.RGBA] : undefined}
-                  red={tintRgb?.red}
-                  green={tintRgb?.green}
-                  blue={tintRgb?.blue}
-                  alpha={tintRgb ? 1 : undefined}
+                  filters={finishRgb ? [Konva.Filters.RGBA] : undefined}
+                  red={finishRgb?.red}
+                  green={finishRgb?.green}
+                  blue={finishRgb?.blue}
+                  alpha={finishRgb ? 1 : undefined}
+                  shadowColor={logoShadow?.color}
+                  shadowBlur={logoShadow?.blur}
+                  shadowOffset={logoShadow?.offset}
+                  shadowOpacity={logoShadow?.opacity}
                   onDragMove={(event) => emitTransform(event.target as Konva.Image)}
                   onTransformEnd={(event) => emitTransform(event.target as Konva.Image)}
                   preventDefault
@@ -157,16 +193,19 @@ export function MockupStage({
               />
             )}
           </Group>
+          {shadowOverlay ? <KonvaImage image={shadowOverlay} width={preset.stage.width} height={preset.stage.height} listening={false} /> : null}
           {overlay ? <KonvaImage image={overlay} width={preset.stage.width} height={preset.stage.height} listening={false} /> : null}
+          {highlightOverlay ? <KonvaImage image={highlightOverlay} width={preset.stage.width} height={preset.stage.height} listening={false} /> : null}
+          {handleOverlay ? <KonvaImage image={handleOverlay} width={preset.stage.width} height={preset.stage.height} listening={false} /> : null}
           {editable && logo ? (
             <Transformer
               ref={transformerRef}
               rotateEnabled
               enabledAnchors={["top-left", "top-right", "bottom-left", "bottom-right"]}
               anchorSize={22}
-              borderStroke="#bdec14"
+              borderStroke="#bded15"
               anchorStroke="#11120e"
-              anchorFill="#bdec14"
+              anchorFill="#bded15"
               keepRatio
             />
           ) : null}

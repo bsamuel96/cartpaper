@@ -1,6 +1,6 @@
-import type { BlendMode, LogoColorMode, LogoTransform, MockupPreset } from "@/types/mockup";
+import type { BlendMode, LogoColorMode, LogoTransform, MockupPreset, PrintFinish } from "@/types/mockup";
 
-const lime = "#bdec14";
+const lime = "#bded15";
 
 function loadImage(src: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -12,10 +12,22 @@ function loadImage(src: string) {
   });
 }
 
-async function canvasTint(image: HTMLImageElement, mode: LogoColorMode, customColor: string) {
-  if (mode === "original") return image;
+function finishColor(finish: PrintFinish, mode: LogoColorMode, customColor: string) {
+  if (finish === "gold-foil") return "#d4af37";
+  if (finish === "silver-foil") return "#d9dde2";
+  if (finish === "white-ink") return "#ffffff";
+  if (finish === "emboss" || finish === "deboss" || finish === "spot-uv") return "#f7f3ea";
+  if (mode === "black") return "#11120e";
+  if (mode === "white") return "#ffffff";
+  if (mode === "lime") return lime;
+  if (mode === "custom") return customColor;
+  return null;
+}
 
-  const color = mode === "black" ? "#11120e" : mode === "white" ? "#ffffff" : mode === "lime" ? lime : customColor;
+async function canvasTint(image: HTMLImageElement, mode: LogoColorMode, customColor: string, finish: PrintFinish) {
+  const color = finishColor(finish, mode, customColor);
+  if (!color) return image;
+
   const canvas = document.createElement("canvas");
   canvas.width = image.naturalWidth;
   canvas.height = image.naturalHeight;
@@ -51,9 +63,11 @@ export async function exportMockupPng(options: {
   logoMode: LogoColorMode;
   customColor: string;
   blendMode: BlendMode;
+  printFinish?: PrintFinish;
   pixelRatio?: number;
 }) {
   const { preset, transform } = options;
+  const finish = options.printFinish ?? "matte-ink";
   const pixelRatio = options.pixelRatio ?? 2;
   const canvas = document.createElement("canvas");
   canvas.width = preset.stage.width * pixelRatio;
@@ -62,10 +76,13 @@ export async function exportMockupPng(options: {
   if (!context) throw new Error("Exportul nu poate fi generat pe acest dispozitiv.");
 
   context.scale(pixelRatio, pixelRatio);
-  const [base, logo, overlay] = await Promise.all([
+  const [base, logo, overlay, shadowOverlay, highlightOverlay, handleOverlay] = await Promise.all([
     loadImage(preset.baseSrc),
     loadImage(options.logoSrc),
     loadImage(preset.overlaySrc),
+    loadImage(preset.shadowOverlaySrc),
+    loadImage(preset.highlightOverlaySrc),
+    loadImage(preset.handleOverlaySrc),
   ]);
 
   context.drawImage(base, 0, 0, preset.stage.width, preset.stage.height);
@@ -79,8 +96,18 @@ export async function exportMockupPng(options: {
   context.clip();
   context.globalAlpha = transform.opacity;
   context.globalCompositeOperation = blendMode(options.blendMode, preset) as GlobalCompositeOperation;
+  if (finish === "gold-foil" || finish === "silver-foil" || finish === "spot-uv") {
+    context.shadowColor = "rgba(255,255,255,0.58)";
+    context.shadowBlur = finish === "spot-uv" ? 18 : 10;
+  }
+  if (finish === "emboss" || finish === "deboss") {
+    context.shadowColor = finish === "emboss" ? "rgba(255,255,255,0.48)" : "rgba(0,0,0,0.36)";
+    context.shadowBlur = 8;
+    context.shadowOffsetX = finish === "emboss" ? -5 : 5;
+    context.shadowOffsetY = finish === "emboss" ? -5 : 5;
+  }
 
-  const renderedLogo = await canvasTint(logo, options.logoMode, options.customColor);
+  const renderedLogo = await canvasTint(logo, options.logoMode, options.customColor, finish);
   const aspect = logo.naturalHeight / logo.naturalWidth;
   context.translate(transform.x, transform.y);
   context.rotate((transform.rotation * Math.PI) / 180);
@@ -88,7 +115,10 @@ export async function exportMockupPng(options: {
   context.restore();
   context.globalCompositeOperation = "source-over";
   context.globalAlpha = 1;
+  context.drawImage(shadowOverlay, 0, 0, preset.stage.width, preset.stage.height);
   context.drawImage(overlay, 0, 0, preset.stage.width, preset.stage.height);
+  context.drawImage(highlightOverlay, 0, 0, preset.stage.width, preset.stage.height);
+  context.drawImage(handleOverlay, 0, 0, preset.stage.width, preset.stage.height);
 
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {

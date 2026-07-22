@@ -5,33 +5,17 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CookieConsent } from "@/components/consent/CookieConsent";
 import { QuoteDialog } from "@/components/quote/QuoteDialog";
+import { AdaptiveHeaderTheme } from "@/components/motion/AdaptiveHeaderTheme";
+import { GrainOverlay } from "@/components/motion/GrainOverlay";
+import { MotionProvider } from "@/components/motion/MotionProvider";
+import { PageTransition } from "@/components/motion/PageTransition";
+import { ScrollProgress } from "@/components/motion/ScrollProgress";
+import { SmoothScrollProvider } from "@/components/motion/SmoothScrollProvider";
 import { siteConfig } from "@/config/siteConfig";
 
 const manrope = localFont({
   src: "../../node_modules/@fontsource-variable/manrope/files/manrope-latin-ext-wght-normal.woff2",
   variable: "--font-body",
-  display: "swap",
-});
-
-const cormorant = localFont({
-  src: [
-    {
-      path: "../../node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-ext-500-normal.woff2",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../../node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-ext-600-normal.woff2",
-      weight: "600",
-      style: "normal",
-    },
-    {
-      path: "../../node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-ext-700-normal.woff2",
-      weight: "700",
-      style: "normal",
-    },
-  ],
-  variable: "--font-display",
   display: "swap",
 });
 
@@ -49,24 +33,41 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     locale: "ro_RO",
     type: "website",
+    images: [{ url: "/brand/og-mark-light.png", width: 512, height: 512, alt: "Cartpaper" }],
+  },
+  icons: {
+    icon: [
+      { url: "/brand/favicon-light.png", media: "(prefers-color-scheme: light)" },
+      { url: "/brand/favicon-dark.png", media: "(prefers-color-scheme: dark)" },
+    ],
+    apple: "/brand/apple-touch-icon.png",
   },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f7f3ea",
+  themeColor: siteConfig.brandLime,
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ro" className={`${manrope.variable} ${cormorant.variable}`} data-scroll-behavior="smooth">
+    <html lang="ro" className={manrope.variable} data-scroll-behavior="smooth">
       <body>
-        <Header />
-        <main id="main-content">{children}</main>
-        <Footer />
-        <CookieConsent />
-        <QuoteDialog />
+        <MotionProvider>
+          <SmoothScrollProvider>
+            <AdaptiveHeaderTheme />
+            <ScrollProgress />
+            <GrainOverlay />
+            <Header />
+            <PageTransition>
+              <main id="main-content">{children}</main>
+            </PageTransition>
+            <Footer />
+            <CookieConsent />
+            <QuoteDialog />
+          </SmoothScrollProvider>
+        </MotionProvider>
       </body>
     </html>
   );

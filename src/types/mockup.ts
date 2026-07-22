@@ -6,6 +6,15 @@ export type LogoColorMode = "original" | "black" | "white" | "lime" | "custom";
 
 export type BlendMode = "normal" | "multiply" | "screen" | "automatic";
 
+export type PrintFinish =
+  | "matte-ink"
+  | "white-ink"
+  | "gold-foil"
+  | "silver-foil"
+  | "emboss"
+  | "deboss"
+  | "spot-uv";
+
 export type MockupPreset = {
   id: MockupId;
   label: string;
@@ -13,6 +22,13 @@ export type MockupPreset = {
   baseSrc: string;
   overlaySrc: string;
   maskSrc: string;
+  shadowOverlaySrc: string;
+  highlightOverlaySrc: string;
+  handleOverlaySrc: string;
+  printMaskSrc: string;
+  bagColorMaskSrc: string;
+  displacementMapSrc: string;
+  posterSrc: string;
   thumbnailSrc: string;
   stage: { width: number; height: number };
   printQuad: [Point, Point, Point, Point];
@@ -24,6 +40,7 @@ export type MockupPreset = {
   };
   recommendedColorMode: LogoColorMode;
   recommendedBlendMode: BlendMode;
+  defaultFinish: PrintFinish;
   bagColorOptions?: Array<{ id: string; label: string; value: string }>;
   accessibleDescription: string;
   placeholder?: boolean;

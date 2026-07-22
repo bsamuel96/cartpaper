@@ -4,8 +4,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Check, Download, ImagePlus, RotateCcw, WandSparkles } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { ArrowLeft, Check, Download, Eye, Images, ImagePlus, RotateCcw, Save, Share2, WandSparkles, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { mockupPresets } from "@/data/mockups";
 import { useObjectUrl } from "@/hooks/useObjectUrl";
 import { usePersonalizerSession } from "@/hooks/usePersonalizerSession";
@@ -14,7 +14,7 @@ import { exportMockupPng } from "@/lib/image/exportStage";
 import { removeBackgroundLocal } from "@/lib/image/localRemovalClient";
 import { sanitizeSvg } from "@/lib/image/sanitizeSvg";
 import { decodeImageDimensions, resolutionWarning, validateFileMeta } from "@/lib/image/validateImage";
-import type { BlendMode, LogoColorMode, LogoTransform, MockupId } from "@/types/mockup";
+import type { BlendMode, LogoColorMode, LogoTransform, MockupId, PrintFinish } from "@/types/mockup";
 import { MockupStage } from "@/components/personalizer/MockupStage";
 
 type LogoAsset = {
@@ -29,6 +29,16 @@ type LogoAsset = {
 
 const steps = ["Logo", "Fundal", "Pungă", "Poziționare", "Previzualizare"] as const;
 const defaultTransform: LogoTransform = { x: 600, y: 820, width: 360, rotation: 0, opacity: 1 };
+const finishLabels: Record<PrintFinish, string> = {
+  "matte-ink": "Cerneală mată",
+  "white-ink": "Cerneală albă",
+  "gold-foil": "Folie aurie",
+  "silver-foil": "Folie argintie",
+  emboss: "Embosare",
+  deboss: "Debosare",
+  "spot-uv": "Lac selectiv",
+};
+const finishOptions = Object.entries(finishLabels) as Array<[PrintFinish, string]>;
 
 export default function PersonalizerClient() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -39,12 +49,17 @@ export default function PersonalizerClient() {
   const [tolerance, setTolerance] = useState(34);
   const [feather, setFeather] = useState(2);
   const [exportUrl, setExportUrl] = useState<string | null>(null);
+  const [exportBlob, setExportBlob] = useState<Blob | null>(null);
+  const [fullscreenOpen, setFullscreenOpen] = useState(false);
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [stored, setStored] = usePersonalizerSession({
     selectedMockupId: "kraft-classic",
     logoMode: "black",
-    customColor: "#bdec14",
+    customColor: "#bded15",
     blendMode: "automatic",
+    printFinish: "matte-ink",
     transform: defaultTransform,
     backgroundMethod: "none",
   });
@@ -54,11 +69,17 @@ export default function PersonalizerClient() {
   const canContinue = currentStep === 0 ? Boolean(logo) : true;
   const summary = useMemo(
     () =>
-      `Logo ${Math.round(stored.transform.width / 6)}% din lățimea zonei de tipar, rotire ${Math.round(
+      `Logo ${Math.round(stored.transform.width / 6)}% din lățimea zonei de tipar, ${finishLabels[stored.printFinish]}, rotire ${Math.round(
         stored.transform.rotation,
       )} grade, opacitate ${Math.round(stored.transform.opacity * 100)}%.`,
-    [stored.transform],
+    [stored.printFinish, stored.transform],
   );
+
+  useEffect(() => {
+    return () => {
+      if (exportUrl) URL.revokeObjectURL(exportUrl);
+    };
+  }, [exportUrl]);
 
   function updateStored(partial: Partial<typeof stored>) {
     setStored((current) => ({ ...current, ...partial }));
@@ -70,6 +91,7 @@ export default function PersonalizerClient() {
       selectedMockupId: mockupId,
       logoMode: nextPreset.recommendedColorMode,
       blendMode: nextPreset.recommendedBlendMode,
+      printFinish: nextPreset.defaultFinish,
       transform: { ...nextPreset.defaultLogo, opacity: 1 },
     });
   }
@@ -189,6 +211,7 @@ export default function PersonalizerClient() {
         logoMode: stored.logoMode,
         customColor: stored.customColor,
         blendMode: stored.blendMode,
+        printFinish: stored.printFinish,
       }).catch(() =>
         exportMockupPng({
           preset,
@@ -197,6 +220,7 @@ export default function PersonalizerClient() {
           logoMode: stored.logoMode,
           customColor: stored.customColor,
           blendMode: stored.blendMode,
+          printFinish: stored.printFinish,
           pixelRatio: 1,
         }),
       );
@@ -205,6 +229,7 @@ export default function PersonalizerClient() {
         if (previous) URL.revokeObjectURL(previous);
         return url;
       });
+      setExportBlob(blob);
       const date = new Date().toISOString().slice(0, 10);
       const anchor = document.createElement("a");
       anchor.href = url;
@@ -225,10 +250,47 @@ export default function PersonalizerClient() {
           bagType: preset.label,
           logoAttached: Boolean(logo),
           simulationAttached: Boolean(exportUrl),
-          configuration: `${preset.label}; mod logo: ${stored.logoMode}; fundal: ${stored.backgroundMethod}; ${summary}`,
+          configuration: `${preset.label}; finisaj: ${finishLabels[stored.printFinish]}; mod logo: ${stored.logoMode}; fundal: ${stored.backgroundMethod}; ${summary}`,
         },
       }),
     );
+  }
+
+  async function shareSimulation() {
+    if (!exportBlob) {
+      setStatus("Descarcă mai întâi simularea, apoi o poți partaja.");
+      return;
+    }
+
+    const file = new File([exportBlob], `cartpaper-simulare-${preset.id}.png`, { type: "image/png" });
+    if (!navigator.share || !navigator.canShare?.({ files: [file] })) {
+      setStatus("Partajarea directă nu este disponibilă în acest browser. Fișierul PNG poate fi descărcat.");
+      return;
+    }
+
+    await navigator.share({
+      title: "Simulare Cartpaper",
+      text: `Simulare ${preset.label} cu ${finishLabels[stored.printFinish]}.`,
+      files: [file],
+    });
+  }
+
+  async function saveProjectToDevice() {
+    if (!logo) return;
+    setSaveStatus("Se salvează local...");
+
+    try {
+      await saveProjectRecord({
+        id: "latest",
+        updatedAt: new Date().toISOString(),
+        logo: logo.blob,
+        logoName: logo.name,
+        configuration: stored,
+      });
+      setSaveStatus("Proiect salvat pe acest dispozitiv.");
+    } catch {
+      setSaveStatus("Proiectul nu a putut fi salvat local în acest browser.");
+    }
   }
 
   return (
@@ -272,6 +334,7 @@ export default function PersonalizerClient() {
               onRemove={() => {
                 setLogo(null);
                 setExportUrl(null);
+                setExportBlob(null);
                 setStatus("");
                 updateStored({ backgroundMethod: "none" });
               }}
@@ -307,6 +370,8 @@ export default function PersonalizerClient() {
               onCenter={centerLogo}
               onFit={fitLogo}
               onReset={() => updateStored({ transform: { ...preset.defaultLogo, opacity: 1 } })}
+              onCompare={() => setCompareOpen(true)}
+              onFullscreen={() => setFullscreenOpen(true)}
             />
           ) : null}
           {currentStep === 4 ? (
@@ -316,9 +381,15 @@ export default function PersonalizerClient() {
               stored={stored}
               summary={summary}
               processing={processing}
+              exportReady={Boolean(exportBlob)}
               onDownload={downloadSimulation}
+              onShare={shareSimulation}
+              onSave={saveProjectToDevice}
               onQuote={openQuote}
               onEdit={setCurrentStep}
+              onCompare={() => setCompareOpen(true)}
+              onFullscreen={() => setFullscreenOpen(true)}
+              saveStatus={saveStatus}
             />
           ) : null}
 
@@ -334,6 +405,7 @@ export default function PersonalizerClient() {
             logoMode={stored.logoMode}
             customColor={stored.customColor}
             blendMode={stored.blendMode}
+            printFinish={stored.printFinish}
             editable={currentStep === 3}
             onTransformChange={(transform) => updateStored({ transform })}
           />
@@ -354,6 +426,48 @@ export default function PersonalizerClient() {
           {currentStep === steps.length - 1 ? "Gata" : "Continuă"}
         </button>
       </div>
+      {fullscreenOpen ? (
+        <PreviewDialog title="Previzualizare pe tot ecranul" onClose={() => setFullscreenOpen(false)}>
+          <MockupStage
+            preset={preset}
+            logoUrl={logoUrl}
+            transform={stored.transform}
+            logoMode={stored.logoMode}
+            customColor={stored.customColor}
+            blendMode={stored.blendMode}
+            printFinish={stored.printFinish}
+          />
+        </PreviewDialog>
+      ) : null}
+      {compareOpen ? (
+        <PreviewDialog title="Compară toate pungile" onClose={() => setCompareOpen(false)}>
+          <div className="compareGrid">
+            {mockupPresets.map((mockup) => (
+              <button
+                className="compareCard"
+                type="button"
+                key={mockup.id}
+                aria-pressed={mockup.id === preset.id}
+                onClick={() => {
+                  resetForPreset(mockup.id);
+                  setCompareOpen(false);
+                }}
+              >
+                <MockupStage
+                  preset={mockup}
+                  logoUrl={logoUrl}
+                  transform={{ ...mockup.defaultLogo, opacity: stored.transform.opacity }}
+                  logoMode={mockup.recommendedColorMode}
+                  customColor={stored.customColor}
+                  blendMode={mockup.recommendedBlendMode}
+                  printFinish={mockup.defaultFinish}
+                />
+                <span>{mockup.label}</span>
+              </button>
+            ))}
+          </div>
+        </PreviewDialog>
+      ) : null}
     </div>
   );
 }
@@ -381,6 +495,8 @@ function StepLogo({
         ref={fileInputRef}
         className="srOnly"
         type="file"
+        tabIndex={-1}
+        aria-hidden="true"
         accept="image/png,image/jpeg,image/webp,image/svg+xml"
         onChange={(event) => {
           const file = event.target.files?.[0];
@@ -503,6 +619,8 @@ function StepPlacement(props: {
   onCenter: () => void;
   onFit: () => void;
   onReset: () => void;
+  onCompare: () => void;
+  onFullscreen: () => void;
 }) {
   return (
     <div className="stepContent placementStep">
@@ -516,11 +634,22 @@ function StepPlacement(props: {
           logoMode={props.stored.logoMode}
           customColor={props.stored.customColor}
           blendMode={props.stored.blendMode}
+          printFinish={props.stored.printFinish}
           editable
           onTransformChange={(transform) => props.onStored({ transform })}
         />
       </div>
       <p className="previewSummary">{props.summary}</p>
+      <div className="inlineActions">
+        <button className="button buttonSecondary" type="button" onClick={props.onFullscreen}>
+          <Eye aria-hidden="true" size={18} />
+          Vezi pe tot ecranul
+        </button>
+        <button className="button buttonSecondary" type="button" onClick={props.onCompare}>
+          <Images aria-hidden="true" size={18} />
+          Compară toate pungile
+        </button>
+      </div>
       <div className="segmentedControl" aria-label="Mod culoare logo">
         {[
           ["original", "Culori originale"],
@@ -545,6 +674,22 @@ function StepPlacement(props: {
           <input type="color" value={props.stored.customColor} onChange={(event) => props.onStored({ customColor: event.target.value })} />
         </label>
       ) : null}
+      <div className="finishPanel">
+        <span>Efect de previzualizare</span>
+        <div className="finishGrid">
+          {finishOptions.map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={props.stored.printFinish === id}
+              onClick={() => props.onStored({ printFinish: id })}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <small>Simulare vizuală orientativă. Finisajul real se confirmă la bunul de tipar.</small>
+      </div>
       <label className="rangeField">
         Dimensiune
         <input type="range" min="120" max="720" value={props.stored.transform.width} onChange={(event) => props.onTransform({ width: Number(event.target.value) })} />
@@ -591,9 +736,15 @@ function StepReview(props: {
   stored: ReturnType<typeof usePersonalizerSession>[0];
   summary: string;
   processing: boolean;
+  exportReady: boolean;
   onDownload: () => void;
+  onShare: () => void;
+  onSave: () => void;
   onQuote: () => void;
   onEdit: (step: number) => void;
+  onCompare: () => void;
+  onFullscreen: () => void;
+  saveStatus: string;
 }) {
   return (
     <div className="stepContent">
@@ -606,6 +757,7 @@ function StepReview(props: {
         logoMode={props.stored.logoMode}
         customColor={props.stored.customColor}
         blendMode={props.stored.blendMode}
+        printFinish={props.stored.printFinish}
       />
       <dl className="reviewList">
         <div>
@@ -615,6 +767,10 @@ function StepReview(props: {
         <div>
           <dt>Mod logo</dt>
           <dd>{props.stored.logoMode}</dd>
+        </div>
+        <div>
+          <dt>Finisaj</dt>
+          <dd>{finishLabels[props.stored.printFinish]}</dd>
         </div>
         <div>
           <dt>Fundal</dt>
@@ -627,14 +783,31 @@ function StepReview(props: {
       </dl>
       <p className="privacyNote">Simulare orientativă. Dimensiunea, poziționarea și culorile finale se confirmă în bunul de tipar.</p>
       <div className="inlineActions">
+        <button className="button buttonSecondary" type="button" onClick={props.onFullscreen}>
+          <Eye aria-hidden="true" size={18} />
+          Vezi pe tot ecranul
+        </button>
+        <button className="button buttonSecondary" type="button" onClick={props.onCompare}>
+          <Images aria-hidden="true" size={18} />
+          Compară toate pungile
+        </button>
         <button className="button buttonPrimary" type="button" disabled={!props.logoUrl || props.processing} onClick={props.onDownload}>
           <Download aria-hidden="true" size={18} />
           Descarcă simularea
+        </button>
+        <button className="button buttonSecondary" type="button" disabled={!props.exportReady} onClick={props.onShare}>
+          <Share2 aria-hidden="true" size={18} />
+          Partajează
+        </button>
+        <button className="button buttonGhost" type="button" disabled={!props.logoUrl} onClick={props.onSave}>
+          <Save aria-hidden="true" size={18} />
+          Salvează pe dispozitiv
         </button>
         <button className="button buttonSecondary" type="button" onClick={props.onQuote}>
           Adaugă la cererea de ofertă
         </button>
       </div>
+      {props.saveStatus ? <p className="statusMessage">{props.saveStatus}</p> : null}
       <div className="editLinks">
         {[0, 1, 2, 3].map((step) => (
           <button type="button" key={step} onClick={() => props.onEdit(step)}>
@@ -644,4 +817,80 @@ function StepReview(props: {
       </div>
     </div>
   );
+}
+
+function PreviewDialog({
+  title,
+  children,
+  onClose,
+}: {
+  title: string;
+  children: React.ReactNode;
+  onClose: () => void;
+}) {
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    panelRef.current?.querySelector<HTMLElement>("button")?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onClose]);
+
+  return (
+    <div className="modalLayer previewDialogLayer" role="presentation" onMouseDown={onClose}>
+      <div
+        ref={panelRef}
+        className="modalPanel previewDialogPanel"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div className="modalHeader">
+          <h2>{title}</h2>
+          <button className="iconButton" type="button" aria-label="Închide previzualizarea" onClick={onClose}>
+            <X aria-hidden="true" size={22} />
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function saveProjectRecord(record: {
+  id: string;
+  updatedAt: string;
+  logo: Blob;
+  logoName: string;
+  configuration: ReturnType<typeof usePersonalizerSession>[0];
+}) {
+  return new Promise<void>((resolve, reject) => {
+    const request = indexedDB.open("cartpaper-personalizer", 1);
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore("projects", { keyPath: "id" });
+    };
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      const db = request.result;
+      const transaction = db.transaction("projects", "readwrite");
+      transaction.objectStore("projects").put(record);
+      transaction.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+      transaction.onerror = () => {
+        db.close();
+        reject(transaction.error);
+      };
+    };
+  });
 }

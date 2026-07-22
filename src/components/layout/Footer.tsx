@@ -1,5 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import { BrandLockup } from "@/components/brand/BrandLockup";
 import { companyConfig } from "@/config/companyConfig";
 import { navItems } from "@/content/siteContent";
 import { CookieSettingsButton } from "@/components/consent/CookieSettingsButton";
@@ -11,12 +12,7 @@ export function Footer() {
     <footer className="siteFooter" id="contact">
       <div className="footerGrid">
         <div className="footerBrand">
-          <Image
-            src="/brand/cartpaper-wordmark-dark-surface.png"
-            width={2000}
-            height={2000}
-            alt="Cartpaper.ro"
-          />
+          <BrandLockup variant="footer" />
           <p>Pungi de hârtie personalizate pentru branduri care vor să fie recunoscute din prima atingere.</p>
           {companyConfig.socialLinks.length > 0 ? (
             <div className="footerSocial">
