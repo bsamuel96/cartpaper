@@ -20,13 +20,11 @@
     "verify:assets": "node scripts/verify-production-assets.mjs",
     "screenshots": "playwright test tests/e2e/screenshots.spec.ts",
     "check": "npm run lint && npm run typecheck && npm run test && npm run verify:mockups && npm run verify:assets && npm run build",
-    "postinstall": "npm run prepare:brand && npm run prepare:placeholders"
+    "postinstall": "npm run prepare:brand"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.3.0",
-    "@fontsource/cormorant-garamond": "^5.3.0",
-    "@fontsource/instrument-serif": "^5.3.0",
-    "@gsap/react": "^2.1.2",
+    "@fontsource-variable/source-serif-4": "^5.3.0",
     "@radix-ui/react-accordion": "^1.2.17",
     "@radix-ui/react-dialog": "^1.1.20",
     "@radix-ui/react-slider": "^1.4.4",
@@ -34,11 +32,8 @@
     "@radix-ui/react-tooltip": "^1.2.13",
     "clsx": "latest",
     "dompurify": "latest",
-    "gsap": "^3.15.0",
     "konva": "latest",
-    "lenis": "^1.3.25",
     "lucide-react": "latest",
-    "motion": "^12.42.2",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getMockupPreset } from "@/data/mockups";
 import type { BlendMode, LogoColorMode, LogoTransform, MockupId, PrintFinish } from "@/types/mockup";
 
 const storageKey = "cartpaper_personalizer_state";
@@ -11,9 +12,33 @@ export type StoredPersonalizerState = {
   customColor: string;
   blendMode: BlendMode;
   printFinish: PrintFinish;
-  transform: LogoTransform;
+  transformsByMockup: Record<MockupId, LogoTransform>;
   backgroundMethod: "none" | "transparent" | "local" | "advanced";
 };
+
+function normalizeState(initialState: StoredPersonalizerState, stored: Partial<StoredPersonalizerState> & { transform?: LogoTransform }) {
+  const selectedMockupId = stored.selectedMockupId ?? initialState.selectedMockupId;
+  const storedFinish = stored.printFinish as string | undefined;
+  const transformsByMockup = {
+    ...initialState.transformsByMockup,
+    ...(stored.transformsByMockup ?? {}),
+  };
+
+  if (stored.transform && !stored.transformsByMockup?.[selectedMockupId]) {
+    transformsByMockup[selectedMockupId] = stored.transform;
+  }
+
+  return {
+    ...initialState,
+    ...stored,
+    selectedMockupId,
+    printFinish:
+      storedFinish === "matte-ink" || storedFinish === "white-ink" || storedFinish === "gold-foil"
+        ? storedFinish
+        : getMockupPreset(selectedMockupId).defaultFinish,
+    transformsByMockup,
+  } satisfies StoredPersonalizerState;
+}
 
 export function usePersonalizerSession(initialState: StoredPersonalizerState) {
   const [state, setState] = useState<StoredPersonalizerState>(() => {
@@ -22,7 +47,7 @@ export function usePersonalizerSession(initialState: StoredPersonalizerState) {
     try {
       const stored = sessionStorage.getItem(storageKey);
       if (stored) {
-        return { ...initialState, ...JSON.parse(stored) };
+        return normalizeState(initialState, JSON.parse(stored));
       }
     } catch {
       return initialState;

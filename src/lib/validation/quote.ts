@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const quoteSchema = z.object({
+  requestType: z.enum(["oferta", "mostre"]).default("oferta"),
   name: z.string().trim().min(2, "Completează numele."),
   company: z.string().trim().optional(),
   email: z.string().trim().email("Adresa de e-mail nu este validă."),
@@ -25,9 +26,12 @@ export const quoteSchema = z.object({
 export type QuotePayload = z.infer<typeof quoteSchema>;
 
 export function buildMailtoFallback(payload: QuotePayload, to: string) {
-  const subject = encodeURIComponent(`Cerere ofertă Cartpaper - ${payload.company || payload.name}`);
+  const subject = encodeURIComponent(
+    `${payload.requestType === "mostre" ? "Cerere kit de mostre" : "Cerere ofertă"} Cartpaper - ${payload.company || payload.name}`,
+  );
   const body = encodeURIComponent(
     [
+      `Tip cerere: ${payload.requestType === "mostre" ? "kit de mostre" : "ofertă"}`,
       `Nume: ${payload.name}`,
       `Companie: ${payload.company || "-"}`,
       `E-mail: ${payload.email}`,

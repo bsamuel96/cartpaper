@@ -2,92 +2,96 @@
 
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { m } from "motion/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { mockupPresets } from "@/data/mockups";
 
 const brandMarkByBag: Record<string, string> = {
   "black-luxury": "/brand/cartpaper-mark-dark.png",
 };
 
-const paletteColors = ["#d7a86f", "#fffefa", "#11120e", "#cb4d45", "#172039", "#bded15"];
+const heroSwatches: Record<string, string> = {
+  "kraft-classic": "Kraft",
+  "white-premium": "Alb",
+  "black-luxury": "Negru",
+  "color-pop": "Coral",
+};
 
 export function HeroBagDeck() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [hintVisible, setHintVisible] = useState(true);
+  const startXRef = useRef<number | null>(null);
   const active = mockupPresets[activeIndex];
 
   function move(direction: -1 | 1) {
-    setHintVisible(false);
     setActiveIndex((current) => (current + direction + mockupPresets.length) % mockupPresets.length);
+  }
+
+  function finishSwipe(clientX: number) {
+    if (startXRef.current === null) return;
+    const delta = clientX - startXRef.current;
+    startXRef.current = null;
+    if (Math.abs(delta) < 44) return;
+    move(delta < 0 ? 1 : -1);
   }
 
   return (
     <div className="heroBagDeck" aria-label="Previzualizare pungi personalizate">
-      <div className="heroDeckStage">
-        {mockupPresets.map((mockup, index) => {
-          const offset = index - activeIndex;
-          const wrappedOffset =
-            Math.abs(offset) > mockupPresets.length / 2 ? offset - Math.sign(offset) * mockupPresets.length : offset;
-
-          return (
-            <m.article
-              className="heroDeckCard"
-              key={mockup.id}
-              aria-hidden={index !== activeIndex}
-              animate={{
-                x: `${wrappedOffset * 13}%`,
-                y: Math.abs(wrappedOffset) * 18,
-                rotate: wrappedOffset * 5,
-                scale: index === activeIndex ? 1 : 0.86,
-                opacity: Math.abs(wrappedOffset) > 1 ? 0 : index === activeIndex ? 1 : 0.62,
-                zIndex: mockupPresets.length - Math.abs(wrappedOffset),
-              }}
-              transition={{ type: "spring", stiffness: 170, damping: 22 }}
-              drag={index === activeIndex ? "x" : false}
-              dragConstraints={{ left: 0, right: 0 }}
-              onDragEnd={(_, info) => {
-                if (info.offset.x < -42) move(1);
-                if (info.offset.x > 42) move(-1);
-              }}
-            >
-              <Image
-                src={mockup.posterSrc ?? mockup.thumbnailSrc}
-                width={1200}
-                height={1500}
-                priority={index === activeIndex}
-                alt={index === activeIndex ? mockup.accessibleDescription : ""}
-              />
-              <Image
-                className={`heroDeckLogo ${mockup.id === "black-luxury" ? "heroDeckLogoDark" : "heroDeckLogoLight"}`}
-                src={brandMarkByBag[mockup.id] ?? "/brand/cartpaper-mark-light.png"}
-                width={512}
-                height={512}
-                alt=""
-                aria-hidden="true"
-              />
-            </m.article>
-          );
-        })}
-        {hintVisible ? <span className="heroSwipeHint">Glisează pentru a schimba punga</span> : null}
+      <div
+        className="heroDeckStage"
+        onPointerDown={(event) => {
+          startXRef.current = event.clientX;
+        }}
+        onPointerUp={(event) => finishSwipe(event.clientX)}
+        onPointerCancel={() => {
+          startXRef.current = null;
+        }}
+      >
+        <article className="heroDeckCard">
+          <Image
+            src={active.posterSrc ?? active.thumbnailSrc}
+            width={1200}
+            height={1500}
+            priority
+            alt={active.accessibleDescription}
+          />
+          <Image
+            className={`heroDeckLogo ${active.id === "black-luxury" ? "heroDeckLogoDark" : "heroDeckLogoLight"}`}
+            src={brandMarkByBag[active.id] ?? "/brand/cartpaper-mark-light.png"}
+            width={512}
+            height={512}
+            alt=""
+            aria-hidden="true"
+          />
+        </article>
       </div>
       <div className="heroDeckControls">
         <button type="button" className="iconButton" aria-label="Punga anterioară" onClick={() => move(-1)}>
           <ChevronLeft aria-hidden="true" size={22} />
         </button>
-        <span>
-          {active.label}
-          <small>{active.shortDescription}</small>
-        </span>
+        <div className="heroSwatchPanel">
+          <strong>{active.label}</strong>
+          <div className="heroSwatches" aria-label="Alege culoarea pungii din hero">
+            {mockupPresets.map((mockup, index) => (
+              <button
+                key={mockup.id}
+                type="button"
+                className={`heroSwatch heroSwatch-${mockup.id}`}
+                aria-current={index === activeIndex ? "true" : undefined}
+                aria-label={`Arată ${mockup.label}`}
+                onClick={() => setActiveIndex(index)}
+              >
+                <span aria-hidden="true" />
+                <small>{heroSwatches[mockup.id] ?? mockup.label}</small>
+              </button>
+            ))}
+          </div>
+        </div>
         <button type="button" className="iconButton" aria-label="Punga următoare" onClick={() => move(1)}>
           <ChevronRight aria-hidden="true" size={22} />
         </button>
       </div>
-      <div className="heroPalette" aria-label="Culori disponibile">
-        {paletteColors.map((color) => (
-          <span key={color} style={{ background: color }} />
-        ))}
-      </div>
+      <p className="srOnly" aria-live="polite">
+        {active.label}
+      </p>
     </div>
   );
 }

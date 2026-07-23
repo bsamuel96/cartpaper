@@ -23,6 +23,18 @@ export function MobileMenu({ variant = "light" }: { variant?: "light" | "dark" }
         setOpen(false);
         triggerRef.current?.focus();
       }
+      if (event.key === "Tab" && panelRef.current) {
+        const focusables = Array.from(panelRef.current.querySelectorAll<HTMLElement>("a, button"));
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
     };
 
     document.addEventListener("keydown", onKeyDown);

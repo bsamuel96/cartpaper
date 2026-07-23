@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
 import { useConsent } from "@/hooks/useConsent";
 import { defaultConsentCategories, type ConsentCategories } from "@/lib/consent/consent";
 
@@ -23,9 +22,29 @@ export function CookieConsent() {
   }, [record?.categories]);
 
   useEffect(() => {
+    if (!loaded) return undefined;
+
     const banner = document.querySelector<HTMLElement>(".cookieBanner");
-    const height = banner ? `${banner.offsetHeight}px` : "0px";
-    document.documentElement.style.setProperty("--cookie-banner-height", !hasDecision && loaded ? height : "0px");
+    const updateHeight = () => {
+      document.documentElement.style.setProperty(
+        "--cookie-banner-height",
+        !hasDecision && banner ? `${banner.offsetHeight}px` : "0px",
+      );
+    };
+
+    updateHeight();
+    if (!banner || hasDecision) return undefined;
+
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(updateHeight);
+    observer?.observe(banner);
+    window.addEventListener("resize", updateHeight);
+    window.addEventListener("orientationchange", updateHeight);
+
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", updateHeight);
+      window.removeEventListener("orientationchange", updateHeight);
+    };
   }, [hasDecision, loaded]);
 
   useEffect(() => {
@@ -67,26 +86,21 @@ export function CookieConsent() {
     lastFocusRef.current?.focus();
   }
 
+  function closePreferences() {
+    setPreferencesOpen(false);
+    lastFocusRef.current?.focus();
+  }
+
   if (!loaded) return null;
 
   return (
     <>
       {!hasDecision ? (
         <section className="cookieBanner" aria-label="Consimțământ cookie">
-          <div className="cookieBannerTop">
-            <p>
-              Folosim cookie-uri necesare pentru funcționarea site-ului. Cu acordul tău, putem activa
-              cookie-uri de analiză și marketing. Poți accepta, refuza sau personaliza opțiunile.
-            </p>
-            <button
-              className="iconButton"
-              type="button"
-              aria-label="Închide bannerul cookie"
-              onClick={() => saveAndClose(defaultConsentCategories)}
-            >
-              <X aria-hidden="true" size={20} />
-            </button>
-          </div>
+          <p>
+            Folosim cookie-uri necesare pentru funcționarea site-ului. Cu acordul tău, putem activa
+            cookie-uri de analiză și marketing. Poți accepta, refuza sau personaliza opțiunile.
+          </p>
           <div className="cookieActions">
             <button className="button buttonGhost" type="button" onClick={() => saveAndClose(defaultConsentCategories)}>
               Refuză opționale
@@ -109,7 +123,7 @@ export function CookieConsent() {
       ) : null}
 
       {preferencesOpen ? (
-        <div className="modalLayer" role="presentation" onMouseDown={() => setPreferencesOpen(false)}>
+        <div className="modalLayer" role="presentation" onMouseDown={closePreferences}>
           <div
             className="modalPanel"
             ref={dialogRef}
@@ -120,7 +134,7 @@ export function CookieConsent() {
           >
             <div className="modalHeader">
               <h2 id="cookie-preferences-title">Preferințe cookie</h2>
-              <button className="iconButton" type="button" onClick={() => setPreferencesOpen(false)} aria-label="Închide">
+              <button className="iconButton" type="button" onClick={closePreferences} aria-label="Închide">
                 ×
               </button>
             </div>

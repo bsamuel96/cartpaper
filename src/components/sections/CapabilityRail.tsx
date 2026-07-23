@@ -1,27 +1,25 @@
-import { ShieldCheck, Sparkles, SwatchBook, TimerReset } from "lucide-react";
-import { DragMarquee } from "@/components/motion/DragMarquee";
+import { CheckCircle2, ClipboardList, ScanSearch } from "lucide-react";
+import { homeContent } from "@/content/siteContent";
 
-const capabilities = [
-  { label: "Simulare pe loc", body: "Previzualizare mobilă înainte de ofertă.", Icon: Sparkles },
-  { label: "Finisaje tactile", body: "Mat, alb, folie, relief și lac selectiv.", Icon: SwatchBook },
-  { label: "Date verificate", body: "Placeholder-ele sunt blocate la producție.", Icon: ShieldCheck },
-  { label: "Răspuns ordonat", body: "Brief-ul ajunge cu configurația completă.", Icon: TimerReset },
-];
+const icons = [ScanSearch, ClipboardList, CheckCircle2];
 
 export function CapabilityRail() {
   return (
-    <section className="capabilityRailSection" data-header-theme="light" aria-label="Capabilități Cartpaper">
-      <DragMarquee className="capabilityRail">
-        {capabilities.map(({ label, body, Icon }) => (
-          <article className="capabilityPill" key={label}>
+    <section className="trustSection" aria-label="Repere Cartpaper">
+      <div className="trustGrid">
+        {homeContent.trustPoints.map(({ title, body }, index) => {
+          const Icon = icons[index];
+          return (
+          <article className="trustItem" key={title}>
             <Icon aria-hidden="true" size={22} />
-            <span>
-              <strong>{label}</strong>
+            <div>
+              <strong>{title}</strong>
               <small>{body}</small>
-            </span>
+            </div>
           </article>
-        ))}
-      </DragMarquee>
+          );
+        })}
+      </div>
     </section>
   );
 }

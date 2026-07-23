@@ -1,23 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
+import "@fontsource-variable/manrope";
+import "@fontsource-variable/source-serif-4";
 import "@/app/globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CookieConsent } from "@/components/consent/CookieConsent";
 import { QuoteDialog } from "@/components/quote/QuoteDialog";
-import { AdaptiveHeaderTheme } from "@/components/motion/AdaptiveHeaderTheme";
-import { GrainOverlay } from "@/components/motion/GrainOverlay";
-import { MotionProvider } from "@/components/motion/MotionProvider";
-import { PageTransition } from "@/components/motion/PageTransition";
-import { ScrollProgress } from "@/components/motion/ScrollProgress";
-import { SmoothScrollProvider } from "@/components/motion/SmoothScrollProvider";
 import { siteConfig } from "@/config/siteConfig";
-
-const manrope = localFont({
-  src: "../../node_modules/@fontsource-variable/manrope/files/manrope-latin-ext-wght-normal.woff2",
-  variable: "--font-body",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
@@ -52,22 +41,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ro" className={manrope.variable} data-scroll-behavior="smooth">
+    <html lang="ro">
       <body>
-        <MotionProvider>
-          <SmoothScrollProvider>
-            <AdaptiveHeaderTheme />
-            <ScrollProgress />
-            <GrainOverlay />
-            <Header />
-            <PageTransition>
-              <main id="main-content">{children}</main>
-            </PageTransition>
-            <Footer />
-            <CookieConsent />
-            <QuoteDialog />
-          </SmoothScrollProvider>
-        </MotionProvider>
+        <Header />
+        <main id="main-content">{children}</main>
+        <Footer />
+        <CookieConsent />
+        <QuoteDialog />
       </body>
     </html>
   );

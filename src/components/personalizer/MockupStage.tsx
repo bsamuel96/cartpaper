@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text, Transformer } from "react-konva";
 import Konva from "konva";
 import useImage from "use-image";
+import { clampTransformToPrintBounds } from "@/lib/personalizer/transform";
 import type { BlendMode, LogoColorMode, LogoTransform, MockupPreset, PrintFinish } from "@/types/mockup";
 
 const lime = "#bded15";
@@ -78,14 +79,7 @@ export function MockupStage({
   }, [tintFilter]);
 
   const composite = blendMode === "automatic" ? preset.recommendedBlendMode : blendMode;
-  const finishTint =
-    printFinish === "gold-foil"
-      ? "#d4af37"
-      : printFinish === "silver-foil"
-        ? "#d9dde2"
-        : printFinish === "white-ink"
-          ? "#ffffff"
-          : tintFilter;
+  const finishTint = printFinish === "gold-foil" ? "#d4af37" : printFinish === "white-ink" ? "#ffffff" : tintFilter;
   const finishRgb = useMemo(() => {
     if (!finishTint || logoMode === "original" && printFinish === "matte-ink") return tintRgb;
     const hex = finishTint.replace("#", "");
@@ -95,28 +89,25 @@ export function MockupStage({
       blue: Number.parseInt(hex.slice(4, 6), 16),
     };
   }, [finishTint, logoMode, printFinish, tintRgb]);
-  const logoShadow =
-    printFinish === "emboss"
-      ? { color: "#ffffff", blur: 8, offset: { x: -5, y: -5 }, opacity: 0.42 }
-      : printFinish === "deboss"
-        ? { color: "#000000", blur: 7, offset: { x: 5, y: 5 }, opacity: 0.32 }
-        : printFinish === "spot-uv"
-          ? { color: "#ffffff", blur: 12, offset: { x: 0, y: 0 }, opacity: 0.36 }
-          : printFinish.includes("foil")
-            ? { color: "#ffffff", blur: 10, offset: { x: -3, y: -3 }, opacity: 0.5 }
-            : null;
+  const logoShadow = printFinish === "gold-foil" ? { color: "#ffffff", blur: 10, offset: { x: -3, y: -3 }, opacity: 0.5 } : null;
 
   function emitTransform(node: Konva.Image) {
     const nextWidth = Math.max(80, node.width() * node.scaleX());
     node.scaleX(1);
     node.scaleY(1);
-    onTransformChange?.({
-      ...transform,
-      x: node.x(),
-      y: node.y(),
-      width: nextWidth,
-      rotation: node.rotation(),
-    });
+    onTransformChange?.(
+      clampTransformToPrintBounds(
+        {
+          ...transform,
+          x: node.x(),
+          y: node.y(),
+          width: nextWidth,
+          rotation: node.rotation(),
+        },
+        preset,
+        logoAspect,
+      ),
+    );
   }
 
   useEffect(() => {
@@ -131,6 +122,10 @@ export function MockupStage({
 
   return (
     <div className="mockupStageFrame" ref={containerRef}>
+      <p className="srOnly">
+        Previzualizare {preset.label}. Logo la {Math.round(transform.x)} pe orizontală, {Math.round(transform.y)} pe verticală,
+        lățime {Math.round(transform.width)} și rotire {Math.round(transform.rotation)} grade.
+      </p>
       <Stage width={width} height={height} scaleX={scale} scaleY={scale} className="mockupStage">
         <Layer listening={editable}>
           {base ? (
@@ -173,6 +168,10 @@ export function MockupStage({
                   shadowBlur={logoShadow?.blur}
                   shadowOffset={logoShadow?.offset}
                   shadowOpacity={logoShadow?.opacity}
+                  dragBoundFunc={(position) => {
+                    const clamped = clampTransformToPrintBounds({ ...transform, x: position.x, y: position.y }, preset, logoAspect);
+                    return { x: clamped.x, y: clamped.y };
+                  }}
                   onDragMove={(event) => emitTransform(event.target as Konva.Image)}
                   onTransformEnd={(event) => emitTransform(event.target as Konva.Image)}
                   preventDefault
@@ -202,7 +201,7 @@ export function MockupStage({
               ref={transformerRef}
               rotateEnabled
               enabledAnchors={["top-left", "top-right", "bottom-left", "bottom-right"]}
-              anchorSize={22}
+              anchorSize={34}
               borderStroke="#bded15"
               anchorStroke="#11120e"
               anchorFill="#bded15"

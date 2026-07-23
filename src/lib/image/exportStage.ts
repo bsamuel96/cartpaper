@@ -14,9 +14,7 @@ function loadImage(src: string) {
 
 function finishColor(finish: PrintFinish, mode: LogoColorMode, customColor: string) {
   if (finish === "gold-foil") return "#d4af37";
-  if (finish === "silver-foil") return "#d9dde2";
   if (finish === "white-ink") return "#ffffff";
-  if (finish === "emboss" || finish === "deboss" || finish === "spot-uv") return "#f7f3ea";
   if (mode === "black") return "#11120e";
   if (mode === "white") return "#ffffff";
   if (mode === "lime") return lime;
@@ -96,15 +94,9 @@ export async function exportMockupPng(options: {
   context.clip();
   context.globalAlpha = transform.opacity;
   context.globalCompositeOperation = blendMode(options.blendMode, preset) as GlobalCompositeOperation;
-  if (finish === "gold-foil" || finish === "silver-foil" || finish === "spot-uv") {
+  if (finish === "gold-foil") {
     context.shadowColor = "rgba(255,255,255,0.58)";
-    context.shadowBlur = finish === "spot-uv" ? 18 : 10;
-  }
-  if (finish === "emboss" || finish === "deboss") {
-    context.shadowColor = finish === "emboss" ? "rgba(255,255,255,0.48)" : "rgba(0,0,0,0.36)";
-    context.shadowBlur = 8;
-    context.shadowOffsetX = finish === "emboss" ? -5 : 5;
-    context.shadowOffsetY = finish === "emboss" ? -5 : 5;
+    context.shadowBlur = 10;
   }
 
   const renderedLogo = await canvasTint(logo, options.logoMode, options.customColor, finish);

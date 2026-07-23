@@ -5,7 +5,7 @@ import { homeContent } from "@/content/siteContent";
 
 export function PersonalizerTeaser() {
   return (
-    <section className="personalizerTeaser" id="servicii" data-header-theme="dark" aria-labelledby="personalizer-teaser-title">
+    <section className="personalizerTeaser" id="servicii" aria-labelledby="personalizer-teaser-title">
       <div>
         <p className="overline">{homeContent.personalizer.overline}</p>
         <h2 id="personalizer-teaser-title">{homeContent.personalizer.title}</h2>

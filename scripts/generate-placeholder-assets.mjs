@@ -1,4 +1,5 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 
@@ -6,6 +7,31 @@ const root = process.cwd();
 const mockupRoot = path.join(root, "public", "mockups");
 const legalRoot = path.join(root, "public", "legal");
 const stage = { width: 1200, height: 1500 };
+const forceDevelopmentPlaceholders = process.argv.includes("--force-development-placeholders");
+
+if (!forceDevelopmentPlaceholders) {
+  console.error(
+    "Refusing to generate development placeholders without --force-development-placeholders. This script is intentionally not run from postinstall.",
+  );
+  process.exit(1);
+}
+
+async function readJsonIfPresent(file) {
+  if (!existsSync(file)) return null;
+
+  try {
+    return JSON.parse(await readFile(file, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+async function assertDevelopmentPlaceholder(metadataFile, label) {
+  const metadata = await readJsonIfPresent(metadataFile);
+  if (metadata?.placeholder === false) {
+    throw new Error(`Refusing to overwrite production asset metadata for ${label}.`);
+  }
+}
 
 const mockups = [
   {
@@ -86,7 +112,6 @@ function baseSvg(mockup) {
     <path d="M305 520 C460 560 740 560 900 520" fill="none" stroke="#fff" opacity=".12" stroke-width="5"/>
     <path d="M320 1190 C480 1238 740 1238 890 1190" fill="none" stroke="#000" opacity=".10" stroke-width="6"/>
     <rect width="1200" height="1500" filter="url(#grain)" opacity=".45"/>
-    <text x="600" y="1416" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" fill="#11120e" opacity=".58">Placeholder dezvoltare - înlocuiește cu mockup PSD licențiat</text>
   </svg>`;
 }
 
@@ -192,6 +217,7 @@ const manifest = {
 
 for (const mockup of mockups) {
   const dir = path.join(mockupRoot, mockup.id);
+  await assertDevelopmentPlaceholder(path.join(dir, "metadata.json"), `mockup ${mockup.id}`);
   await mkdir(dir, { recursive: true });
 
   await sharp(Buffer.from(baseSvg(mockup))).webp({ quality: 88 }).toFile(path.join(dir, "base.webp"));
@@ -238,12 +264,12 @@ await writeFile(path.join(mockupRoot, "asset-manifest.json"), `${JSON.stringify(
 
 const anpcSvg = `
 <svg width="250" height="50" viewBox="0 0 250 50" xmlns="http://www.w3.org/2000/svg">
-  <rect width="250" height="50" fill="#fff7d8"/>
-  <rect x="1" y="1" width="248" height="48" fill="none" stroke="#9f2f2f" stroke-width="2"/>
-  <text x="125" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#9f2f2f">DEV PLACEHOLDER</text>
-  <text x="125" y="36" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#11120e">ANPC SAL oficial lipsește</text>
+  <rect width="250" height="50" rx="2" fill="#ffffff"/>
+  <rect x="1" y="1" width="248" height="48" rx="2" fill="none" stroke="#9f2f2f" stroke-width="2"/>
+  <text x="125" y="31" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#9f2f2f">ANPC SAL</text>
 </svg>`;
 
+await assertDevelopmentPlaceholder(path.join(legalRoot, "anpc-sal.metadata.json"), "ANPC SAL");
 await sharp(Buffer.from(anpcSvg)).png().toFile(path.join(legalRoot, "anpc-sal.png"));
 await writeFile(
   path.join(legalRoot, "anpc-sal.metadata.json"),

@@ -6,14 +6,7 @@ export type LogoColorMode = "original" | "black" | "white" | "lime" | "custom";
 
 export type BlendMode = "normal" | "multiply" | "screen" | "automatic";
 
-export type PrintFinish =
-  | "matte-ink"
-  | "white-ink"
-  | "gold-foil"
-  | "silver-foil"
-  | "emboss"
-  | "deboss"
-  | "spot-uv";
+export type PrintFinish = "matte-ink" | "white-ink" | "gold-foil";
 
 export type MockupPreset = {
   id: MockupId;

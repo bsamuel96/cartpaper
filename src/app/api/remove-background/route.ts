@@ -37,6 +37,17 @@ async function callRemoveBgProvider(file: File, apiKey: string, signal: AbortSig
   return { type: "success" as const, blob: await response.blob() };
 }
 
+export async function GET() {
+  return NextResponse.json(
+    { enabled: Boolean(process.env.REMOVE_BG_API_KEY) },
+    {
+      headers: {
+        "Cache-Control": "no-store",
+      },
+    },
+  );
+}
+
 export async function POST(request: NextRequest) {
   if (!sameOrigin(request)) {
     return NextResponse.json({ message: "Cererea nu a putut fi validată." }, { status: 403 });

@@ -78,7 +78,7 @@ export function Footer() {
         </div>
       </div>
       <div className="footerBottom">
-        <p>© {new Date().getFullYear()} Cartpaper. Conținutul juridic necesită revizuire înainte de producție.</p>
+        <p>© {new Date().getFullYear()} Cartpaper.</p>
         <div className="footerLegal">
           <Link href="/politica-de-confidentialitate">Confidențialitate</Link>
           <Link href="/politica-de-cookies">Cookies</Link>

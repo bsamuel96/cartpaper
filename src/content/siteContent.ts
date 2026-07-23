@@ -14,14 +14,13 @@ export const homeContent = {
     titleAccent: "frumos.",
     body:
       "Creăm pungi de hârtie personalizate pentru afaceri care vor să fie ținute minte — de la magazine locale la branduri naționale. Fiecare pungă devine o extensie a identității tale.",
-    primaryCta: "Personalizează o pungă",
+    primaryCta: "Personalizează",
     secondaryCta: "Cere o ofertă",
-    chips: ["Mâner răsucit", "Laminare mată"],
   },
-  stats: [
-    { value: "500+", label: "branduri deservite", verified: false },
-    { value: "1M+", label: "pungi produse", verified: false },
-    { value: "48h", label: "răspuns rapid", verified: false },
+  trustPoints: [
+    { title: "Simulare înainte de ofertă", body: "Vezi proporția logo-ului pe pungă înainte să trimiți brief-ul." },
+    { title: "Configurație clară", body: "Modelul, finisajul și poziționarea ajung împreună în cererea de ofertă." },
+    { title: "Bun de tipar", body: "Producția se confirmă după verificarea detaliilor finale." },
   ],
   process: {
     overline: "PROCES",
